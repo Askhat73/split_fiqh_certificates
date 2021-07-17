@@ -1,0 +1,47 @@
+{% extends '_base.html' %}
+
+{% block content %}
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Домашняя</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'course-detail' certificate_type.course.slug %}">{{ certificate_type.course.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ certificate_type.name }}</li>
+      </ol>
+    </nav>
+
+    <form method="post" class="form-signin align-content-center col-md-6" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="course_name" class="form-label">Файл с сертификатами</label>
+          <input type="file" name="file" class="form-control" id="course_name" placeholder="На арабском">
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+    <div class="my-3 p-3 bg-white rounded box-shadow">
+        <h6 class="border-bottom border-gray pb-2 mb-0">Сертификаты</h6>
+
+        {% if certificate_type.parse_files.all %}
+            {% for parse_file in certificate_type.parse_files.all %}
+                <div class="media pt-3">
+                    <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <a href="{% url 'parse-file-detail' certificate_type.course.slug certificate_type.slug parse_file.pk %}" class="text-dark text-decoration-none"><strong class="text-gray-dark">{{ parse_file.file_name }}</strong></a>
+                            <form action="{% url 'parse-file-delete' certificate_type.course.slug certificate_type.slug parse_file.pk %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn"><i class="bi-x-circle-fill" style="color: red;"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="media text-muted pt-3">
+                <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <strong class="text-gray-dark">У вас нет сертификатов</strong>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

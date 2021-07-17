@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - ./.env
+    volumes:
+    - .:/code
+    ports:
+    - 8000:8000
+    extra_hosts:
+      - "hostname:127.0.0.1"
+    depends_on:
+      - db
+      - tika
+  db:
+    image: postgres:12.0-alpine
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=fiqh_db
+    volumes:
+    - postgres_data:/var/lib/postgresql/data/
+  tika:
+    image: apache/tika:1.24.1
+    ports:
+      - 9998:9998
+
+volumes:
+  postgres_data:

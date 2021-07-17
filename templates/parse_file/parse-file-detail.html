@@ -1,0 +1,88 @@
+{% extends '_base.html' %}
+
+{% block content %}
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Домашняя</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'course-detail' parse_file.certificate_type.course.slug %}">{{ parse_file.certificate_type.course.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'certificate-type-detail' parse_file.certificate_type.course.slug parse_file.certificate_type.slug %}">{{ parse_file.certificate_type.name }}</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ parse_file.file_name }}</li>
+      </ol>
+    </nav>
+    <form method="post" class="form-signin align-content-center col-md-6" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-check form-switch">
+          <input name="is_automatic_calibration"  class="form-check-input" type="checkbox" data-bs-toggle="collapse" data-bs-target="#manualCalibration" value="" onchange="updateCheckboxValue(this.checked)" id="isAutoCalibration" checked>
+          <label class="form-check-label" for="isAutoCalibration">
+            Автоматическая калибровка
+          </label>
+        </div>
+        <div class="mb-3 collapse" id="manualCalibration">
+            <input type="hidden" id="calibratedValue" value="{{ parse_file.start_with_auto }}">
+            <input type="hidden" id="autoCalibratedValue" value="{{ parse_file.start_with_auto }}">
+            <input type="hidden" id="originalCalibratedString" value="{{ parse_file.parsed_page }}">
+            <label for="cutFrom" class="form-label" id="cutFromSymbol">Обрезать с символа: {{ parse_file.start_with_auto }}</label>
+            <input type="range" name="start_with" class="form-range" min="0" max="{{ parse_file.parsed_page | length }}" step="1" value="{{ parse_file.start_with_auto }}" onchange="updateRangeValue(this.value);" id="cutFrom">
+            <div class="card" style="width: auto;">
+                <img src="{{ parse_file.calibration_certificate.url }}" class="card-img-top" alt="certificate">
+            </div>
+            <label for="calibratedString" class="form-label">Откалибруйте так чтобы полное имя сертификата было на первой строке и перед именем не было лишних символов</label>
+            <code><pre id="calibratedString" style="background-color: #f8f9fa">{{ parse_file.trimmed_parsed_page }}</pre></code>
+        </div>
+        {% for field in form %}
+            {% if field.errors %}
+                <div class="alert alert-danger" role="alert">
+                  {{ field.errors|striptags }}
+                </div>
+            {% endif %}
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Получить сертификаты</button>
+    </form>
+
+    <br>
+    {% if parse_file.parse_sessions.all %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Откалибровано с символа №</th>
+              <th scope="col">Скачать файл</th>
+              <th scope="col">Удалить</th>
+            </tr>
+          </thead>
+          <tbody>
+                {% for parse_session in parse_file.parse_sessions.all %}
+                    <tr>
+                      <th scope="row">{{ forloop.counter }}</th>
+                      <td>{{ parse_session.start_with }}</td>
+                      <td><a class="btn btn-primary" href="{{ parse_session.certificates.url }}">Скачать</a></td>
+                      <td>
+                          <form action="{% url 'parse-session-delete' parse_session.pk %}" method="post">
+                              {% csrf_token %}
+                              <button type="submit" class="btn btn-danger">Удалить</button>
+                          </form>
+                      </td>
+                    </tr>
+                {% endfor %}
+          </tbody>
+        </table>
+    {% endif %}
+
+<script>
+    function updateRangeValue(value) {
+        const originalCalibratedString =  document.getElementById('originalCalibratedString').value
+        document.getElementById('calibratedValue').value = value;
+        document.getElementById('cutFromSymbol').innerHTML = 'Обрезать с символа: ' + value;
+        document.getElementById('calibratedString').innerHTML = originalCalibratedString.slice(value);
+    }
+    function updateCheckboxValue(isChecked) {
+        if (isChecked) {
+            document.getElementById('cutFrom').value = document.getElementById('autoCalibratedValue').value;
+            return true;
+        }
+        document.getElementById('cutFrom').value = document.getElementById('calibratedValue').value;
+    }
+    // TODO: Вынести JS
+    // TODO: добавить вывод валидаций всех форм
+</script>
+{% endblock content %}
