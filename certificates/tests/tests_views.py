@@ -12,7 +12,7 @@ from certificates.models import Course, CertificateType, ParseFile, \
     ParseSession
 
 
-class HomeViewTest(TestCase):
+class CourseCreateViewTest(TestCase):
 
     def test_url(self):
         url = reverse('home')
@@ -33,42 +33,42 @@ class HomeViewTest(TestCase):
         course = Course.objects.filter(name=course_name).first()
         self.assertIsNotNone(course)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        redirect_url = reverse('course-detail', kwargs={'slug': course.slug})
+        redirect_url = reverse('certificate-type-create', kwargs={'slug': course.slug})
         self.assertEqual(response.url, redirect_url)
 
 
-class CourseDetailViewTest(TestCase):
+class CertificateTypeCreateViewTest(TestCase):
 
     def setUp(self):
         self.course = Course.objects.create(name='test name')
 
     def test_url(self):
-        url = reverse('course-detail', kwargs={'slug': self.course.slug})
+        url = reverse('certificate-type-create', kwargs={'slug': self.course.slug})
         self.assertEqual(url, '/courses/test-name/')
 
     def test_get_success(self):
-        url = reverse('course-detail', kwargs={'slug': self.course.slug})
+        url = reverse('certificate-type-create', kwargs={'slug': self.course.slug})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, 'course/course-detail.html')
+        self.assertTemplateUsed(response, 'certificate_type/certificate-type-create.html')
 
     def test_post_success(self):
-        url = reverse('course-detail', kwargs={'slug': self.course.slug})
+        url = reverse('certificate-type-create', kwargs={'slug': self.course.slug})
         certificate_type_name = 'test'
         response = self.client.post(url, data={'name': certificate_type_name})
 
         certificate_type = CertificateType.objects.filter(name=certificate_type_name).first()
         self.assertIsNotNone(certificate_type)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        redirect_url = reverse('certificate-type-detail', kwargs={
+        redirect_url = reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': certificate_type.slug,
         })
         self.assertEqual(response.url, redirect_url)
 
 
-class CertificateTypeDetailViewTest(TestCase):
+class ParseFileCreateViewTest(TestCase):
 
     UPLOAD_DIRECTORY = settings.BASE_DIR / 'fixtures'
 
@@ -80,28 +80,28 @@ class CertificateTypeDetailViewTest(TestCase):
         )
 
     def test_url(self):
-        url = reverse('certificate-type-detail', kwargs={
+        url = reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
         })
         self.assertEqual(url, '/courses/test-name/type/test-type-name/')
 
     def test_get_success(self):
-        url = reverse('certificate-type-detail', kwargs={
+        url = reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
         })
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, 'certificate_type/certificate-type-detail.html')
+        self.assertTemplateUsed(response, 'parse_file/parse-file-create.html')
 
     @mock.patch('certificates.services.ParsePdfService')
     def test_post_success(self, parse_pdf_service: MagicMock):
         self.parsed_data = '\n\n\n \nIbrahim\n'
         parse_pdf_service.return_value = Mock(return_value=self.parsed_data)
 
-        url = reverse('certificate-type-detail', kwargs={
+        url = reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
         })
@@ -114,7 +114,7 @@ class CertificateTypeDetailViewTest(TestCase):
         os.remove(parsed_file.calibration_certificate.path)
         self.assertIsNotNone(parsed_file)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        redirect_url = reverse('parse-file-detail', kwargs={
+        redirect_url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': parsed_file.pk,
@@ -122,7 +122,7 @@ class CertificateTypeDetailViewTest(TestCase):
         self.assertEqual(response.url, redirect_url)
 
 
-class ParseFileDetailViewTest(TestCase):
+class ParseSessionCreateViewTest(TestCase):
 
     UPLOAD_DIRECTORY = settings.BASE_DIR / 'fixtures'
     NAME_POSITION = 5
@@ -151,7 +151,7 @@ class ParseFileDetailViewTest(TestCase):
         os.remove(self.parse_file.calibration_certificate.path)
 
     def test_url(self):
-        url = reverse('parse-file-detail', kwargs={
+        url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -159,7 +159,7 @@ class ParseFileDetailViewTest(TestCase):
         self.assertEqual(url, f'/courses/test-name/type/test-type-name/file/{self.parse_file.pk}/')
 
     def test_get_success(self):
-        url = reverse('parse-file-detail', kwargs={
+        url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -167,7 +167,7 @@ class ParseFileDetailViewTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, 'parse_file/parse-file-detail.html')
+        self.assertTemplateUsed(response, 'parse_session/parse-session-create.html')
 
     @mock.patch('certificates.services.ParsePdfService')
     def test_post_success(self, parse_pdf_service: MagicMock):
@@ -176,7 +176,7 @@ class ParseFileDetailViewTest(TestCase):
             side_effect=self.parsed_data,
         )
 
-        url = reverse('parse-file-detail', kwargs={
+        url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -188,7 +188,7 @@ class ParseFileDetailViewTest(TestCase):
         os.remove(parsed_session.certificates.path)
         self.assertIsNotNone(parsed_session)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-        redirect_url = reverse('parse-file-detail', kwargs={
+        redirect_url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -202,7 +202,7 @@ class ParseFileDetailViewTest(TestCase):
             side_effect=self.parsed_data,
         )
 
-        url = reverse('parse-file-detail', kwargs={
+        url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -274,7 +274,7 @@ class ParseSessionDeleteViewTest(TestCase):
         self.assertIsNone(parsed_session)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
-        redirect_url = reverse('parse-file-detail', kwargs={
+        redirect_url = reverse('parse-session-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.parse_file.pk,
@@ -335,7 +335,7 @@ class CertificateTypeDeleteView(TestCase):
         self.assertIsNone(certificate_type)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
-        redirect_url = reverse('course-detail', kwargs={
+        redirect_url = reverse('certificate-type-create', kwargs={
             'slug': self.course.slug,
         })
 
@@ -389,7 +389,7 @@ class ParseFileDeleteView(TestCase):
         self.assertIsNone(parsed_file)
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
 
-        redirect_url = reverse('certificate-type-detail', kwargs={
+        redirect_url = reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.certificate_type.slug,
         })

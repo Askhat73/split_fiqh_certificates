@@ -24,17 +24,17 @@
                 <div class="media pt-3">
                     <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
                         <div class="d-flex justify-content-between align-items-center w-100">
-                            <a href="{% url 'course-detail' course.slug %}" class="text-dark text-decoration-none"><strong class="text-gray-dark">{{ course.name }}</strong></a>
+                            <a href="{% url 'certificate-type-create' course.slug %}" class="text-dark text-decoration-none"><strong class="text-gray-dark">{{ course.name }}</strong></a>
                             <form action="{% url 'course-delete' course.slug %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn"><i class="bi-x-circle-fill" style="color: red;"></i></button>
                             </form>
                         </div>
                         {% if not course.certificate_types.all %}
-                            <a href="{% url 'course-detail' course.slug %}" class="badge rounded-pill bg-success text-decoration-none">Добавить</a>
+                            <a href="{% url 'certificate-type-create' course.slug %}" class="badge rounded-pill bg-success text-decoration-none">Добавить</a>
                         {% endif %}
                         {% for type in course.certificate_types.all %}
-                            <a href="{% url 'certificate-type-detail' course.slug type.slug %}" class="badge rounded-pill bg-primary text-decoration-none">{{ type.name }}</a>
+                            <a href="{% url 'parse-file-create' course.slug type.slug %}" class="badge rounded-pill bg-primary text-decoration-none">{{ type.name }}</a>
                         {% endfor %}
                     </div>
                 </div>

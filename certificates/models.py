@@ -22,7 +22,7 @@ class Course(models.Model):
         verbose_name_plural = 'Курсы'
 
     def get_absolute_url(self) -> str:
-        return reverse('course-detail', kwargs={'slug': self.slug})
+        return reverse('certificate-type-create', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -46,7 +46,7 @@ class CertificateType(models.Model):
         unique_together = ['name', 'course_id']
 
     def get_absolute_url(self) -> str:
-        return reverse('certificate-type-detail', kwargs={
+        return reverse('parse-file-create', kwargs={
             'course_slug': self.course.slug,
             'slug': self.slug,
         })
@@ -73,7 +73,7 @@ class ParseFile(models.Model):
                                           validators=[MinValueValidator(0)])
 
     def get_absolute_url(self) -> str:
-        return reverse('parse-file-detail', kwargs={
+        return reverse('parse-session-create', kwargs={
             'course_slug': self.certificate_type.course.slug,
             'slug': self.certificate_type.slug,
             'pk': self.pk,
@@ -111,7 +111,7 @@ class ParseSession(models.Model):
         unique_together = ['parse_file_id', 'start_with']
 
     def get_absolute_url(self) -> str:
-        return reverse('parse-file-detail', kwargs={
+        return reverse('parse-session-create', kwargs={
             'course_slug': self.parse_file.certificate_type.course.slug,
             'slug': self.parse_file.certificate_type.slug,
             'pk': self.parse_file.pk,

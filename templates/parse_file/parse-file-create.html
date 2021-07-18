@@ -4,7 +4,7 @@
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">Домашняя</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'course-detail' certificate_type.course.slug %}">{{ certificate_type.course.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'certificate-type-create' certificate_type.course.slug %}">{{ certificate_type.course.name }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ certificate_type.name }}</li>
       </ol>
     </nav>
@@ -25,7 +25,7 @@
                 <div class="media pt-3">
                     <div class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
                         <div class="d-flex justify-content-between align-items-center w-100">
-                            <a href="{% url 'parse-file-detail' certificate_type.course.slug certificate_type.slug parse_file.pk %}" class="text-dark text-decoration-none"><strong class="text-gray-dark">{{ parse_file.file_name }}</strong></a>
+                            <a href="{% url 'parse-session-create' certificate_type.course.slug certificate_type.slug parse_file.pk %}" class="text-dark text-decoration-none"><strong class="text-gray-dark">{{ parse_file.file_name }}</strong></a>
                             <form action="{% url 'parse-file-delete' certificate_type.course.slug certificate_type.slug parse_file.pk %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="btn"><i class="bi-x-circle-fill" style="color: red;"></i></button>

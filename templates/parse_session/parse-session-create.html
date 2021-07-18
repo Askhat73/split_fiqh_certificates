@@ -4,8 +4,8 @@
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{% url 'home' %}">Домашняя</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'course-detail' parse_file.certificate_type.course.slug %}">{{ parse_file.certificate_type.course.name }}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'certificate-type-detail' parse_file.certificate_type.course.slug parse_file.certificate_type.slug %}">{{ parse_file.certificate_type.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'certificate-type-create' parse_file.certificate_type.course.slug %}">{{ parse_file.certificate_type.course.name }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'parse-file-create' parse_file.certificate_type.course.slug parse_file.certificate_type.slug %}">{{ parse_file.certificate_type.name }}</a></li>
         <li class="breadcrumb-item active" aria-current="page">{{ parse_file.file_name }}</li>
       </ol>
     </nav>
