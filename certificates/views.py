@@ -79,7 +79,7 @@ class ParseFileDetailView(CreateView, DetailView):
 
     def form_valid(self, form: ModelForm):
         form.instance.parse_file = get_object_or_404(self.get_queryset())
-        is_parse_session_exist = ParseSession.objects.filter(
+        is_parse_session_exist = self.model.objects.filter(
             parse_file=form.instance.parse_file,
             start_with=form.cleaned_data.get('start_with'),
         ).exists()
